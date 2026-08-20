@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LayoutGrid, Users, Share2, Wallet, MessageSquareText, ClipboardList, Megaphone, Menu, X } from 'lucide-react';
+import { LayoutGrid, Users, Share2, Wallet, ClipboardList, Megaphone, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/logo';
 
@@ -11,7 +11,6 @@ const NAV = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/referrals', label: 'Referrals', icon: Share2 },
-  { href: '/admin/inquiries', label: 'Inquiries', icon: MessageSquareText },
   { href: '/admin/leads', label: 'Leads', icon: ClipboardList },
   { href: '/admin/commissions', label: 'Commissions', icon: Wallet },
   { href: '/admin/announcements', label: 'Announcements', icon: Megaphone },

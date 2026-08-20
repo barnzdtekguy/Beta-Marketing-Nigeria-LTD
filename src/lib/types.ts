@@ -90,21 +90,6 @@ export interface AnnouncementRow {
   created_at: string;
 }
 
-export type InquiryStatus = 'new' | 'contacted' | 'pending_transaction' | 'closed' | 'rejected';
-
-export interface InquiryRow {
-  id: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  request_details: string;
-  referred_by: string | null;
-  source_ref_code: string | null;
-  status: InquiryStatus;
-  transaction_completed_at: string | null;
-  created_at: string;
-}
-
 export interface UserReferralStats {
   user_id: string;
   completed_referrals: number;

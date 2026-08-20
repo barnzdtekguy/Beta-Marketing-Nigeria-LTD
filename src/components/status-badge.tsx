@@ -10,10 +10,6 @@ const STYLES: Record<string, string> = {
   rejected: 'bg-danger-soft text-danger',
   failed: 'bg-danger-soft text-danger',
   void: 'bg-black/5 text-text-muted',
-  new: 'bg-brand/10 text-brand-dark',
-  contacted: 'bg-sky-100 text-sky-700',
-  pending_transaction: 'bg-amber-soft text-amber',
-  closed: 'bg-success-soft text-success',
   successful: 'bg-success-soft text-success',
   unsuccessful: 'bg-danger-soft text-danger',
 };

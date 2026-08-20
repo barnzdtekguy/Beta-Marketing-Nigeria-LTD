@@ -7,8 +7,7 @@ import type {
 
 // ----------------------------------------------------------------------------
 // Client leads (admin) — prospective buyers realtors bring in directly.
-// Distinct from `inquiries` (public buyer/investor contact-form leads):
-// these are realtor-submitted, admin sets the commission amount per sale.
+// Admin sets the commission amount per sale once it closes.
 // ----------------------------------------------------------------------------
 
 export interface LeadsQueryParams {
@@ -390,58 +389,6 @@ export async function getReferrals({
 // ----------------------------------------------------------------------------
 // Commissions
 // ----------------------------------------------------------------------------
-
-export async function getInquiries({
-  page = 1,
-  pageSize = 20,
-  status = 'all',
-}: {
-  page?: number;
-  pageSize?: number;
-  status?: string;
-}) {
-  const supabase = createClient();
-
-  let query = supabase
-    .from('inquiries')
-    .select(
-      'id, full_name, email, phone, request_details, inquiry_type, referred_by, source_ref_code, status, transaction_completed_at, created_at, referrer:referred_by(full_name)',
-      { count: 'exact' }
-    )
-    .order('created_at', { ascending: false });
-
-  if (status !== 'all') {
-    query = query.eq('status', status);
-  }
-
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-  query = query.range(from, to);
-
-  const { data, error, count } = await query;
-  if (error) throw error;
-
-  return {
-    inquiries:
-      (data ?? []).map((row: any) => ({
-        id: row.id,
-        full_name: row.full_name,
-        email: row.email,
-        phone: row.phone,
-        request_details: row.request_details,
-        inquiry_type: row.inquiry_type,
-        referred_by: row.referred_by,
-        source_ref_code: row.source_ref_code,
-        status: row.status,
-        transaction_completed_at: row.transaction_completed_at,
-        created_at: row.created_at,
-        referrer_name: row.referrer?.full_name ?? null,
-      })) ?? [],
-    total: count ?? 0,
-    page,
-    pageSize,
-  };
-}
 
 export async function getCommissionSummary() {
   const supabase = createClient();

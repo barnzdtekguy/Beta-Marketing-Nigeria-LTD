@@ -12,8 +12,6 @@ import {
   ShieldCheck,
   Share2,
   Wallet,
-  TrendingUp,
-  Home,
 } from 'lucide-react';
 
 async function resolveReferrer(ref: string) {
@@ -85,8 +83,6 @@ export default async function HomePage({
   const ref = searchParams.ref ?? '';
   const referrerName = await resolveReferrer(ref);
   const registerHref = ref ? `/register?ref=${encodeURIComponent(ref)}` : '/register';
-  const investorHref = ref ? `/investor?ref=${encodeURIComponent(ref)}` : '/investor';
-  const buyerHref = ref ? `/buyer?ref=${encodeURIComponent(ref)}` : '/buyer';
 
   return (
     <div className="min-h-screen bg-paper text-text">
@@ -183,39 +179,6 @@ export default async function HomePage({
             </div>
           </div>
         </section>
-
-        <ScrollReveal>
-          <section id="inquire" className="mt-8 rounded-[28px] border border-border bg-card p-6 shadow-panel sm:p-8">
-            <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.22em] text-brand">Not a realtor?</p>
-                <h2 className="mt-2 font-display text-2xl text-text sm:text-3xl">
-                  Looking to buy a home, or invest in property?
-                </h2>
-                <p className="mt-2 text-sm text-text-muted max-w-lg">
-                  Tell us what you need and a realtor from our network will follow up directly — no account required.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href={investorHref}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white transition hover:bg-black whitespace-nowrap"
-                >
-                  <TrendingUp size={16} />
-                  I&apos;m an Investor
-                </a>
-                <a
-                  href={buyerHref}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-5 py-3 text-sm font-medium text-text transition hover:border-brand hover:text-brand whitespace-nowrap"
-                >
-                  <Home size={16} />
-                  I am a Buyer
-                </a>
-              </div>
-            </div>
-          </section>
-        </ScrollReveal>
 
         <section id="how-it-works" className="mt-20">
           <ScrollReveal className="mb-8 max-w-2xl">

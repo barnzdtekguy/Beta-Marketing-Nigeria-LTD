@@ -6,7 +6,6 @@ import {
   getRealtorStats,
   getRealtorDirectReferrals,
   getRealtorOverrideEarnings,
-  getRealtorInquiries,
   getRealtorLeads,
   getDownlineSalesActivity,
   getAnnouncements,
@@ -29,12 +28,11 @@ export default async function RealtorDashboardPage() {
   const realtor = await getCurrentRealtor();
   if (!realtor) redirect('/login');
 
-  const [stats, directReferrals, overrideEarnings, inquiries, leads, downlineActivity, announcements] =
+  const [stats, directReferrals, overrideEarnings, leads, downlineActivity, announcements] =
     await Promise.all([
       getRealtorStats(realtor.id),
       getRealtorDirectReferrals(realtor.id),
       getRealtorOverrideEarnings(realtor.id),
-      getRealtorInquiries(realtor.id),
       getRealtorLeads(realtor.id),
       getDownlineSalesActivity(realtor.id),
       getAnnouncements(5),
@@ -247,65 +245,6 @@ export default async function RealtorDashboardPage() {
           </div>
         </div>
       )}
-
-      <div className="bg-card border border-border rounded-xl shadow-card overflow-hidden">
-        <div className="px-5 py-3 border-b border-border">
-          <h2 className="font-display text-sm text-text">Buyer and investor inquiry pipeline</h2>
-          <p className="text-xs text-text-muted mt-0.5">
-            The commission percentage is only unlocked once the referred buyer or investor completes a transaction.
-          </p>
-        </div>
-        <div className="overflow-x-auto scrollbar-thin">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-xs text-text-muted">
-                <th className="px-5 py-3 font-medium">Name</th>
-                <th className="px-5 py-3 font-medium">Type</th>
-                <th className="px-5 py-3 font-medium">Contact</th>
-                <th className="px-5 py-3 font-medium">Need</th>
-                <th className="px-5 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inquiries.map((inquiry: any) => (
-                <tr key={inquiry.id} className="border-b border-border last:border-0">
-                  <td className="px-5 py-3 font-medium text-text">{inquiry.full_name}</td>
-                  <td className="px-5 py-3">
-                    <span
-                      className={
-                        inquiry.inquiry_type === 'investor'
-                          ? 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand/10 text-brand-dark capitalize'
-                          : 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700 capitalize'
-                      }
-                    >
-                      {inquiry.inquiry_type ?? 'buyer'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-text-muted">
-                    <div>{inquiry.email}</div>
-                    <div>{inquiry.phone}</div>
-                  </td>
-                  <td className="px-5 py-3 text-text-muted max-w-xs whitespace-pre-wrap">{inquiry.request_details}</td>
-                  <td className="px-5 py-3">
-                    <StatusBadge status={inquiry.transaction_completed_at ? 'closed' : inquiry.status} />
-                    {!inquiry.transaction_completed_at && (
-                      <div className="mt-2 text-[11px] text-text-muted">Awaiting transaction completion</div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-
-              {inquiries.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-text-muted text-sm">
-                    No buyer or investor inquiries have been attributed to you yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </main>
   );
 }

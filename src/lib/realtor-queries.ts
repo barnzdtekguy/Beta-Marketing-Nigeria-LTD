@@ -72,17 +72,6 @@ export async function getRealtorOverrideEarnings(realtorId: string) {
   return data ?? [];
 }
 
-export async function getRealtorInquiries(realtorId: string) {
-  const supabase = createClient();
-  const { data } = await supabase
-    .from('inquiries')
-    .select('*')
-    .eq('referred_by', realtorId)
-    .order('created_at', { ascending: false });
-
-  return data ?? [];
-}
-
 // ----------------------------------------------------------------------------
 // Client leads a realtor has personally submitted, and their payout
 // applications for successful sales.
