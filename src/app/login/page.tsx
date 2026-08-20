@@ -1,8 +1,10 @@
 import { signIn } from './actions';
-import { Logo } from '@/components/logo';
 import { TechRealEstateBackdrop } from '@/components/tech-real-estate-backdrop';
 import { AutoDismissError } from '@/components/auto-dismiss-error';
 import { PasswordField } from '@/components/password-field';
+import { AuthSubmitProvider } from '@/components/auth-submit-context';
+import { AnimatedLogo } from '@/components/animated-logo';
+import { AuthSubmitButton } from '@/components/auth-submit-button';
 
 const ERROR_COPY: Record<string, string> = {
   'not-authorized': "That account isn't linked to a realtor profile. Register first, or contact Beta Marketing.",
@@ -18,11 +20,12 @@ export default function RealtorLoginPage({
     : null;
 
   return (
+    <AuthSubmitProvider>
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="hidden lg:flex flex-col justify-between bg-ink text-white p-12 relative overflow-hidden">
         <TechRealEstateBackdrop variant="dark" />
         <div className="relative z-10 flex items-center gap-2.5">
-          <Logo variant="icon" size={26} href="/" />
+          <AnimatedLogo size={26} href="/" dark />
           <span className="font-display font-medium tracking-tight">Beta Marketing</span>
         </div>
         <div className="relative z-10 max-w-sm">
@@ -39,7 +42,7 @@ export default function RealtorLoginPage({
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2.5 mb-10">
-            <Logo variant="icon" size={26} href="/" />
+            <AnimatedLogo size={26} href="/" />
             <span className="font-display font-medium tracking-tight text-text">
               Beta Marketing
             </span>
@@ -78,12 +81,12 @@ export default function RealtorLoginPage({
 
             <AutoDismissError message={errorMessage} />
 
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-brand text-white text-sm font-medium py-2.5 hover:bg-brand-dark transition"
+            <AuthSubmitButton
+              pendingLabel="Signing in…"
+              className="w-full rounded-lg bg-brand text-white text-sm font-medium py-2.5 hover:bg-brand-dark transition disabled:opacity-70"
             >
               Sign in
-            </button>
+            </AuthSubmitButton>
           </form>
 
           <p className="mt-6 text-center text-xs text-text-faint">
@@ -92,5 +95,6 @@ export default function RealtorLoginPage({
         </div>
       </div>
     </div>
+    </AuthSubmitProvider>
   );
 }

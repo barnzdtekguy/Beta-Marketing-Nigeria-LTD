@@ -1,10 +1,12 @@
 import { registerUser } from './actions';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { Logo } from '@/components/logo';
 import { TechRealEstateBackdrop } from '@/components/tech-real-estate-backdrop';
 import { AutoDismissError } from '@/components/auto-dismiss-error';
 import { PasswordField } from '@/components/password-field';
 import { ReferralCodeToggle } from '@/components/referral-code-toggle';
+import { AuthSubmitProvider } from '@/components/auth-submit-context';
+import { AnimatedLogo } from '@/components/animated-logo';
+import { AuthSubmitButton } from '@/components/auth-submit-button';
 
 async function resolveReferrer(ref: string) {
   if (!ref) return null;
@@ -34,11 +36,12 @@ export default async function RegisterPage({
   const referrerName = await resolveReferrer(ref);
 
   return (
+    <AuthSubmitProvider>
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="hidden lg:flex flex-col justify-between bg-ink text-white p-12 relative overflow-hidden">
         <TechRealEstateBackdrop variant="dark" />
         <div className="relative z-10 flex items-center gap-2.5">
-          <Logo variant="icon" size={26} href="/" />
+          <AnimatedLogo size={26} href="/" dark />
           <span className="font-display font-medium tracking-tight">Beta Marketing</span>
         </div>
         <div className="relative z-10 max-w-sm">
@@ -56,7 +59,7 @@ export default async function RegisterPage({
       <div className="flex items-center justify-center p-6 sm:p-8">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2.5 mb-8 justify-center">
-            <Logo variant="icon" size={26} href="/" />
+            <AnimatedLogo size={26} href="/" />
             <span className="font-display font-medium tracking-tight text-text">
               Beta Marketing
             </span>
@@ -126,12 +129,12 @@ export default async function RegisterPage({
 
             <AutoDismissError message={searchParams.error ?? null} />
 
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-brand text-white text-sm font-medium py-2.5 hover:bg-brand-dark transition"
+            <AuthSubmitButton
+              pendingLabel="Creating your account…"
+              className="w-full rounded-lg bg-brand text-white text-sm font-medium py-2.5 hover:bg-brand-dark transition disabled:opacity-70"
             >
               Create my account
-            </button>
+            </AuthSubmitButton>
           </form>
 
           <p className="mt-6 text-center text-xs text-text-faint">
@@ -142,5 +145,6 @@ export default async function RegisterPage({
         </div>
       </div>
     </div>
+    </AuthSubmitProvider>
   );
 }

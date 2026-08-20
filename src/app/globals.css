@@ -110,3 +110,15 @@
     opacity: 1;
   }
 }
+
+@keyframes gather-seat {
+  0%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
