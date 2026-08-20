@@ -89,7 +89,7 @@ export default async function HomePage({
       <header className="sticky top-0 z-40 border-b border-border/80 bg-paper/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <a href="#top" className="flex items-center gap-3">
-            <Logo variant="icon" size={28} href="/" />
+            <Logo variant="icon" size={28} />
             <div>
               <p className="font-display text-lg tracking-tight text-text">Beta Marketing</p>
               <p className="text-[10px] uppercase tracking-[0.22em] text-text-faint">Referral Network</p>
