@@ -4,8 +4,9 @@ import { TechRealEstateBackdrop } from '@/components/tech-real-estate-backdrop';
 import { AutoDismissError } from '@/components/auto-dismiss-error';
 import { PasswordField } from '@/components/password-field';
 import { ReferralCodeToggle } from '@/components/referral-code-toggle';
+import { Logo } from '@/components/logo';
 import { AuthSubmitProvider } from '@/components/auth-submit-context';
-import { AnimatedLogo } from '@/components/animated-logo';
+import { SubmitOverlay } from '@/components/submit-overlay';
 import { AuthSubmitButton } from '@/components/auth-submit-button';
 
 async function resolveReferrer(ref: string) {
@@ -37,11 +38,12 @@ export default async function RegisterPage({
 
   return (
     <AuthSubmitProvider>
+    <SubmitOverlay label="Creating your account…" />
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="hidden lg:flex flex-col justify-between bg-ink text-white p-12 relative overflow-hidden">
         <TechRealEstateBackdrop variant="dark" />
         <div className="relative z-10 flex items-center gap-2.5">
-          <AnimatedLogo size={26} href="/" dark />
+          <Logo variant="icon" size={26} href="/" />
           <span className="font-display font-medium tracking-tight">Beta Marketing</span>
         </div>
         <div className="relative z-10 max-w-sm">
@@ -59,7 +61,7 @@ export default async function RegisterPage({
       <div className="flex items-center justify-center p-6 sm:p-8">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2.5 mb-8 justify-center">
-            <AnimatedLogo size={26} href="/" />
+            <Logo variant="icon" size={26} href="/" />
             <span className="font-display font-medium tracking-tight text-text">
               Beta Marketing
             </span>
