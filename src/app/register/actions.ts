@@ -1,16 +1,8 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { generateUniqueReferralCode } from '@/lib/referral';
-
-// Commission paid at each level of the referral chain when someone new
-// registers. Index 0 = the direct referrer (level 1), index 1 = that
-// referrer's own upline (level 2), and so on. To pay out a 3rd level too,
-// just add another number — creditUplineCommissions() below already walks
-// as far up the chain as this array goes.
-const COMMISSION_RATES = [2500, 500];
 
 export async function registerUser(formData: FormData) {
   const fullName = String(formData.get('full_name') ?? '').trim();
@@ -51,7 +43,10 @@ export async function registerUser(formData: FormData) {
 
   // Resolve referral attribution, if any. Try a trackable issued link
   // first (referral_links.code), then fall back to a user's own
-  // referral_code shared directly.
+  // referral_code shared directly. Commission isn't credited yet — that
+  // happens once they confirm their email, in /auth/confirm — but we
+  // still need to remember who referred them (and which specific link,
+  // for its click count) until then.
   let referrerId: string | null = null;
   let referralLinkId: string | null = null;
 
@@ -78,19 +73,15 @@ export async function registerUser(formData: FormData) {
   // Create the real login account through the public signUp flow — not
   // supabase.auth.admin.createUser(), which never sends a confirmation
   // email no matter what email_confirm is set to. This is what actually
-  // triggers Supabase to email them a verification link. Requires
-  // "Confirm email" to be turned on in Supabase Auth settings (Auth →
-  // Providers → Email), and the deployed origin to be in Auth → URL
-  // Configuration → Redirect URLs, or the confirmation link will fail.
-  const host = headers().get('host');
-  const origin = `${host?.includes('localhost') ? 'http' : 'https'}://${host}`;
-
+  // triggers Supabase's confirmation email. No session exists here — that
+  // only happens once they click the link and land on /auth/confirm.
+  // Requires "Confirm email" to be turned on in Supabase Auth settings
+  // (Auth → Providers → Email).
   const authClient = createClient();
   const { data: authData, error: authError } = await authClient.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/login?confirmed=1`,
       data: { full_name: fullName, phone: phone || null },
     },
   });
@@ -114,8 +105,9 @@ export async function registerUser(formData: FormData) {
       phone: phone || null,
       referral_code: newReferralCode,
       referred_by: referrerId,
-      status: 'active',
+      status: 'pending',
       auth_id: authData!.user!.id,
+      signup_referral_link_id: referralLinkId,
     })
     .select('id')
     .single();
@@ -127,66 +119,5 @@ export async function registerUser(formData: FormData) {
     fail("Couldn't complete registration. Try again.");
   }
 
-  if (referrerId) {
-    await creditUplineCommissions(supabase, referrerId, newUser!.id, referralLinkId);
-  }
-
-  // authClient.auth.signUp() only returns a session immediately if "Confirm
-  // email" is off — in which case they're already signed in here, same as
-  // before. When confirmation is required, there's no session yet: they
-  // need to click the emailed link before /login will let them in.
-  const pending = !authData.session;
-
-  redirect(
-    `/register/success?code=${encodeURIComponent(newReferralCode)}&name=${encodeURIComponent(fullName)}${pending ? '&pending=1' : ''}`
-  );
-}
-
-/**
- * Credits the direct referrer (level 1) and, if they were themselves
- * referred by someone, that upline too (level 2), and so on up the chain
- * — one row in `referrals` per level, each with its own commission amount.
- * Stops when either the chain runs out or COMMISSION_RATES does.
- */
-async function creditUplineCommissions(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  directReferrerId: string,
-  newUserId: string,
-  directLinkId: string | null
-) {
-  let currentReferrerId: string | null = directReferrerId;
-  let level = 1;
-
-  while (currentReferrerId && level <= COMMISSION_RATES.length) {
-    await supabase.from('referrals').insert({
-      referrer_id: currentReferrerId,
-      referred_user_id: newUserId,
-      referral_link_id: level === 1 ? directLinkId : null,
-      level,
-      status: 'completed',
-      commission_amount: COMMISSION_RATES[level - 1],
-      commission_status: 'unpaid',
-    });
-
-    if (level === 1 && directLinkId) {
-      const { data: linkRow } = await supabase
-        .from('referral_links')
-        .select('clicks')
-        .eq('id', directLinkId)
-        .single();
-      await supabase
-        .from('referral_links')
-        .update({ clicks: (linkRow?.clicks ?? 0) + 1 })
-        .eq('id', directLinkId);
-    }
-
-    const { data: referrerRow }: { data: { referred_by: string | null } | null } = await supabase
-      .from('users')
-      .select('referred_by')
-      .eq('id', currentReferrerId)
-      .single();
-
-    currentReferrerId = referrerRow?.referred_by ?? null;
-    level++;
-  }
+  redirect(`/register/pending?email=${encodeURIComponent(email)}`);
 }
