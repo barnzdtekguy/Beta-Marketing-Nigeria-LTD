@@ -14,7 +14,7 @@ export default function RegisterSuccessPage({
     <div className="min-h-screen flex items-center justify-center bg-paper p-6">
       <div className="w-full max-w-sm text-center">
         <div className="flex items-center gap-2.5 mb-8 justify-center">
-          <Logo variant="icon" size={24} />
+          <Logo variant="icon" size={24} href="/" />
           <span className="font-display font-medium tracking-tight text-text text-sm">Beta Marketing</span>
         </div>
 

@@ -37,7 +37,7 @@ export default async function BuyerPage({
       <div className="hidden lg:flex flex-col justify-between bg-ink text-white p-12 relative overflow-hidden">
         <TechRealEstateBackdrop variant="dark" />
         <div className="relative z-10 flex items-center gap-2.5">
-          <Logo variant="icon" size={26} />
+          <Logo variant="icon" size={26} href="/" />
           <span className="font-display font-medium tracking-tight">Beta Marketing</span>
         </div>
         <div className="relative z-10 max-w-sm">
@@ -54,7 +54,7 @@ export default async function BuyerPage({
       <div className="flex items-center justify-center p-6 sm:p-8">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2.5 mb-8 justify-center">
-            <Logo variant="icon" size={26} />
+            <Logo variant="icon" size={26} href="/" />
             <span className="font-display font-medium tracking-tight text-text">
               Beta Marketing
             </span>

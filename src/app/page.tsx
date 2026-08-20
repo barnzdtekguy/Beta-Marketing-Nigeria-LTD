@@ -93,7 +93,7 @@ export default async function HomePage({
       <header className="sticky top-0 z-40 border-b border-border/80 bg-paper/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <a href="#top" className="flex items-center gap-3">
-            <Logo variant="icon" size={28} />
+            <Logo variant="icon" size={28} href="/" />
             <div>
               <p className="font-display text-lg tracking-tight text-text">Beta Marketing</p>
               <p className="text-[10px] uppercase tracking-[0.22em] text-text-faint">Referral Network</p>
@@ -293,7 +293,7 @@ export default async function HomePage({
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.3fr_0.7fr_0.7fr] lg:px-8">
           <div>
             <div className="flex items-center gap-3">
-              <Logo variant="icon" size={28} />
+              <Logo variant="icon" size={28} href="/" />
               <span className="font-display text-xl tracking-tight">Beta Marketing</span>
             </div>
             <p className="mt-4 max-w-md text-sm leading-7 text-white/65">
