@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { generateUniqueReferralCode } from '@/lib/referral';
 
@@ -74,18 +75,30 @@ export async function registerUser(formData: FormData) {
     }
   }
 
-  // Create the real login account first. Auto-confirmed since this is a
-  // realtor signing up directly, not an email-verification flow.
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+  // Create the real login account through the public signUp flow — not
+  // supabase.auth.admin.createUser(), which never sends a confirmation
+  // email no matter what email_confirm is set to. This is what actually
+  // triggers Supabase to email them a verification link. Requires
+  // "Confirm email" to be turned on in Supabase Auth settings (Auth →
+  // Providers → Email), and the deployed origin to be in Auth → URL
+  // Configuration → Redirect URLs, or the confirmation link will fail.
+  const host = headers().get('host');
+  const origin = `${host?.includes('localhost') ? 'http' : 'https'}://${host}`;
+
+  const authClient = createClient();
+  const { data: authData, error: authError } = await authClient.auth.signUp({
     email,
     password,
-    email_confirm: true,
+    options: {
+      emailRedirectTo: `${origin}/login?confirmed=1`,
+      data: { full_name: fullName, phone: phone || null },
+    },
   });
 
   if (authError || !authData.user) {
     console.error('[registerUser] auth account creation failed:', authError?.message);
     fail(
-      authError?.message?.includes('already been registered')
+      authError?.message?.toLowerCase().includes('registered')
         ? 'That email is already registered. Try signing in instead.'
         : "Couldn't create your account. Try again."
     );
@@ -118,14 +131,15 @@ export async function registerUser(formData: FormData) {
     await creditUplineCommissions(supabase, referrerId, newUser!.id, referralLinkId);
   }
 
-  // Sign them in immediately so "Go to your dashboard" on the success
-  // page works without asking them to log in again right after they just
-  // set a password. Uses the cookie-bound client (not the service role
-  // one) so it actually sets the session cookie on this response.
-  const authClient = createClient();
-  await authClient.auth.signInWithPassword({ email, password });
+  // authClient.auth.signUp() only returns a session immediately if "Confirm
+  // email" is off — in which case they're already signed in here, same as
+  // before. When confirmation is required, there's no session yet: they
+  // need to click the emailed link before /login will let them in.
+  const pending = !authData.session;
 
-  redirect(`/register/success?code=${encodeURIComponent(newReferralCode)}&name=${encodeURIComponent(fullName)}`);
+  redirect(
+    `/register/success?code=${encodeURIComponent(newReferralCode)}&name=${encodeURIComponent(fullName)}${pending ? '&pending=1' : ''}`
+  );
 }
 
 /**
