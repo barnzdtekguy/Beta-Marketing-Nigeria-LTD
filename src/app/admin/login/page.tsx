@@ -6,6 +6,7 @@ import { Logo } from '@/components/logo';
 import { AuthSubmitProvider } from '@/components/auth-submit-context';
 import { SubmitOverlay } from '@/components/submit-overlay';
 import { AuthSubmitButton } from '@/components/auth-submit-button';
+import { TrackedForm } from '@/components/tracked-form';
 
 const ERROR_COPY: Record<string, string> = {
   'not-authorized': "That account isn't on the admin list yet. Ask a superadmin to add you.",
@@ -55,7 +56,7 @@ export default function AdminLoginPage({
             Internal access only. Contact a superadmin if you need an invite.
           </p>
 
-          <form action={signIn} className="mt-8 space-y-4">
+          <TrackedForm action={signIn} className="mt-8 space-y-4">
             <input type="hidden" name="next" value={searchParams.next ?? '/admin'} />
 
             <div>
@@ -89,7 +90,7 @@ export default function AdminLoginPage({
             >
               Sign in
             </AuthSubmitButton>
-          </form>
+          </TrackedForm>
 
           <p className="mt-6 text-center text-xs text-text-faint">
             Realtor? <a href="/register" className="text-brand hover:text-brand-dark">Register here</a> instead.

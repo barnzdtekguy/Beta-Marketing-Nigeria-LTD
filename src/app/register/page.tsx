@@ -8,6 +8,7 @@ import { Logo } from '@/components/logo';
 import { AuthSubmitProvider } from '@/components/auth-submit-context';
 import { SubmitOverlay } from '@/components/submit-overlay';
 import { AuthSubmitButton } from '@/components/auth-submit-button';
+import { TrackedForm } from '@/components/tracked-form';
 
 async function resolveReferrer(ref: string) {
   if (!ref) return null;
@@ -76,7 +77,7 @@ export default async function RegisterPage({
             )}
           </p>
 
-          <form action={registerUser} className="mt-8 space-y-4">
+          <TrackedForm action={registerUser} className="mt-8 space-y-4">
             <div>
               <label htmlFor="full_name" className="block text-xs font-medium text-text-muted mb-1.5">
                 Full name
@@ -137,7 +138,7 @@ export default async function RegisterPage({
             >
               Create my account
             </AuthSubmitButton>
-          </form>
+          </TrackedForm>
 
           <p className="mt-6 text-center text-xs text-text-faint">
             Already registered? <a href="/login" className="text-brand hover:text-brand-dark">Sign in</a>
