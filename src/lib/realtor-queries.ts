@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import type { UserReferralStats } from '@/lib/types';
+import type { AnnouncementRow, ClientLeadRow, CommissionPaymentRow, UserReferralStats } from '@/lib/types';
 
 /**
  * The logged-in realtor's own users row. Relies on the "Realtors can read
@@ -80,5 +80,75 @@ export async function getRealtorInquiries(realtorId: string) {
     .eq('referred_by', realtorId)
     .order('created_at', { ascending: false });
 
+  return data ?? [];
+}
+
+// ----------------------------------------------------------------------------
+// Client leads a realtor has personally submitted, and their payout
+// applications for successful sales.
+// ----------------------------------------------------------------------------
+
+export async function getRealtorLeads(realtorId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('client_leads')
+    .select('*')
+    .eq('realtor_id', realtorId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as ClientLeadRow[];
+}
+
+export async function getRealtorPayoutApplications(realtorId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('commission_payments')
+    .select('*')
+    .eq('user_id', realtorId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as CommissionPaymentRow[];
+}
+
+export async function getAnnouncements(limit = 10) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('announcements')
+    .select('id, title, body, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return (data ?? []) as AnnouncementRow[];
+}
+
+// Sales activity surfaced to a referrer: once someone they directly referred
+// applies for payout on a successful sale, it shows up here so the referrer
+// can see "{name} has made a sale" on their own dashboard.
+export async function getDownlineSalesActivity(realtorId: string, limit = 10) {
+  const supabase = createClient();
+
+  const { data: downline, error: downlineErr } = await supabase
+    .from('users')
+    .select('id')
+    .eq('referred_by', realtorId);
+  if (downlineErr) throw downlineErr;
+
+  const downlineIds = (downline ?? []).map((u) => u.id);
+  if (downlineIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from('commission_payments')
+    .select(
+      'id, amount, status, created_at, realtor:user_id(full_name), lead:lead_id(client_name, property_type)'
+    )
+    .in('user_id', downlineIds)
+    .not('lead_id', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
   return data ?? [];
 }

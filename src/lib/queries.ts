@@ -6,6 +6,80 @@ import type {
 } from '@/lib/types';
 
 // ----------------------------------------------------------------------------
+// Client leads (admin) — prospective buyers realtors bring in directly.
+// Distinct from `inquiries` (public buyer/investor contact-form leads):
+// these are realtor-submitted, admin sets the commission amount per sale.
+// ----------------------------------------------------------------------------
+
+export interface LeadsQueryParams {
+  search?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getLeads({ search = '', status = 'all', page = 1, pageSize = 20 }: LeadsQueryParams) {
+  const supabase = createClient();
+
+  let query = supabase
+    .from('client_leads')
+    .select(
+      'id, client_name, client_phone, client_email, property_type, status, commission_amount, created_at, realtor:realtor_id(id, full_name)',
+      { count: 'exact' }
+    )
+    .order('created_at', { ascending: false });
+
+  if (status !== 'all') {
+    query = query.eq('status', status);
+  }
+
+  if (search.trim()) {
+    const term = search.trim();
+    query = query.or(`client_name.ilike.%${term}%,client_phone.ilike.%${term}%,client_email.ilike.%${term}%`);
+  }
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  return { leads: data ?? [], total: count ?? 0, page, pageSize };
+}
+
+export async function getLeadById(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('client_leads')
+    .select('*, realtor:realtor_id(id, full_name, email, phone)')
+    .eq('id', id)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ----------------------------------------------------------------------------
+// Announcements (admin)
+// ----------------------------------------------------------------------------
+
+export async function getAllAnnouncements({ page = 1, pageSize = 20 }: { page?: number; pageSize?: number }) {
+  const supabase = createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error, count } = await supabase
+    .from('announcements')
+    .select('id, title, body, created_at, admin:admin_id(full_name)', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+  return { announcements: data ?? [], total: count ?? 0, page, pageSize };
+}
+
+// ----------------------------------------------------------------------------
 // Current admin (for the topbar identity, and any role-gated UI later)
 // ----------------------------------------------------------------------------
 
@@ -403,9 +477,10 @@ export async function getCommissionPayments({
 
   let query = supabase
     .from('commission_payments')
-    .select('id, amount, method, reference, status, paid_at, created_at, user:user_id(id, full_name, email)', {
-      count: 'exact',
-    })
+    .select(
+      'id, amount, method, reference, status, paid_at, created_at, bank_name, account_number, account_name, lead_id, user:user_id(id, full_name, email), lead:lead_id(client_name, property_type)',
+      { count: 'exact' }
+    )
     .order('created_at', { ascending: false });
 
   if (status !== 'all') {

@@ -8,6 +8,8 @@ export type ReferralStatus = 'pending' | 'completed' | 'rejected';
 export type CommissionStatus = 'unpaid' | 'paid' | 'void';
 export type PaymentStatus = 'pending' | 'paid' | 'failed';
 export type AdminRole = 'admin' | 'superadmin';
+export type LeadStatus = 'pending' | 'successful' | 'unsuccessful';
+export type PropertyType = 'land' | 'house' | 'apartment' | 'commercial' | 'other';
 
 export interface AdminRow {
   id: string;
@@ -58,6 +60,33 @@ export interface CommissionPaymentRow {
   reference: string | null;
   status: PaymentStatus;
   paid_at: string | null;
+  created_at: string;
+  lead_id: string | null;
+  bank_name: string | null;
+  account_number: string | null;
+  account_name: string | null;
+}
+
+export interface ClientLeadRow {
+  id: string;
+  realtor_id: string;
+  client_name: string;
+  client_phone: string;
+  client_email: string | null;
+  property_type: PropertyType;
+  property_details: string | null;
+  status: LeadStatus;
+  commission_amount: number | null;
+  admin_notes: string | null;
+  decided_at: string | null;
+  created_at: string;
+}
+
+export interface AnnouncementRow {
+  id: string;
+  admin_id: string | null;
+  title: string;
+  body: string;
   created_at: string;
 }
 

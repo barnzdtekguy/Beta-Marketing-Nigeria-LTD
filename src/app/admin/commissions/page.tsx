@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { StatCard } from '@/components/stat-card';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Wallet, CheckCircle2, Clock3 } from 'lucide-react';
+import { approvePayout, rejectPayout } from './actions';
 
 const PAGE_SIZE = 20;
 
@@ -52,11 +53,12 @@ export default async function CommissionsPage({
               <thead>
                 <tr className="border-b border-border text-left text-xs text-text-muted">
                   <th className="px-5 py-3 font-medium">User</th>
+                  <th className="px-5 py-3 font-medium">For</th>
                   <th className="px-5 py-3 font-medium text-right">Amount</th>
-                  <th className="px-5 py-3 font-medium">Method</th>
-                  <th className="px-5 py-3 font-medium">Reference</th>
+                  <th className="px-5 py-3 font-medium">Bank details</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Paid on</th>
+                  <th className="px-5 py-3 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
@@ -67,23 +69,60 @@ export default async function CommissionsPage({
                         {p.user?.full_name ?? '—'}
                       </Link>
                     </td>
+                    <td className="px-5 py-3 text-text-muted">
+                      {p.lead ? `Sale — ${p.lead.client_name}` : (p.method ?? 'Referral bonus')}
+                    </td>
                     <td className="px-5 py-3 text-right tabular-nums">{formatCurrency(p.amount)}</td>
-                    <td className="px-5 py-3 text-text-muted">{p.method ?? '—'}</td>
-                    <td className="px-5 py-3 text-text-muted font-mono text-xs">{p.reference ?? '—'}</td>
+                    <td className="px-5 py-3 text-text-muted text-xs">
+                      {p.bank_name ? (
+                        <>
+                          <p className="text-text">{p.account_name}</p>
+                          <p>
+                            {p.bank_name} · {p.account_number}
+                          </p>
+                        </>
+                      ) : (
+                        p.reference ?? '—'
+                      )}
+                    </td>
                     <td className="px-5 py-3">
                       <StatusBadge status={p.status} />
                     </td>
                     <td className="px-5 py-3 text-text-muted">
                       {p.paid_at ? formatDate(p.paid_at) : '—'}
                     </td>
+                    <td className="px-5 py-3">
+                      {p.status === 'pending' && (
+                        <div className="flex items-center justify-end gap-2">
+                          <form action={approvePayout}>
+                            <input type="hidden" name="payment_id" value={p.id} />
+                            <button
+                              type="submit"
+                              className="rounded-lg bg-success text-white text-xs font-medium px-2.5 py-1.5 hover:opacity-90 transition"
+                            >
+                              Mark paid
+                            </button>
+                          </form>
+                          <form action={rejectPayout}>
+                            <input type="hidden" name="payment_id" value={p.id} />
+                            <button
+                              type="submit"
+                              className="rounded-lg border border-border text-text text-xs font-medium px-2.5 py-1.5 hover:bg-black/[0.03] transition"
+                            >
+                              Reject
+                            </button>
+                          </form>
+                        </div>
+                      )}
+                    </td>
                   </tr>
                 ))}
 
                 {payments.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-5 py-12 text-center text-text-muted text-sm">
-                      No payment records yet. They&apos;ll show up here once commissions start getting
-                      paid out.
+                    <td colSpan={7} className="px-5 py-12 text-center text-text-muted text-sm">
+                      No payment records yet. They&apos;ll show up here once realtors start applying for
+                      payouts.
                     </td>
                   </tr>
                 )}

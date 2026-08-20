@@ -14,6 +14,8 @@ const STYLES: Record<string, string> = {
   contacted: 'bg-sky-100 text-sky-700',
   pending_transaction: 'bg-amber-soft text-amber',
   closed: 'bg-success-soft text-success',
+  successful: 'bg-success-soft text-success',
+  unsuccessful: 'bg-danger-soft text-danger',
 };
 
 export function StatusBadge({ status }: { status: string }) {
