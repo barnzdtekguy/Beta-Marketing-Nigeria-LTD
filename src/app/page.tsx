@@ -2,6 +2,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { Logo } from '@/components/logo';
 import { TechRealEstateBackdrop } from '@/components/tech-real-estate-backdrop';
 import { Referral3DIcon } from '@/components/referral-3d-icon';
+import { IPhoneDashboardMockup } from '@/components/iphone-mockup';
 import { ScrollReveal } from '@/components/scroll-reveal';
 import { MobileNav } from '@/components/mobile-nav';
 import {
@@ -179,6 +180,33 @@ export default async function HomePage({
             </div>
           </div>
         </section>
+
+        <ScrollReveal className="mt-20">
+          <section className="relative overflow-hidden rounded-[32px] border border-border bg-gradient-to-b from-white to-brand/5 px-6 py-14 text-center shadow-panel sm:px-8 lg:py-20">
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-brand">Step one</p>
+            <h2 className="mx-auto mt-3 max-w-xl font-display text-3xl text-text sm:text-4xl">
+              Share your referral link
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-base leading-7 text-text-muted">
+              Create your Beta Marketing account and receive a referral link you can share with
+              clients and other realtors.
+            </p>
+
+            <div className="mt-12">
+              <IPhoneDashboardMockup />
+            </div>
+
+            <div className="mt-10">
+              <a
+                href={registerHref}
+                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3.5 text-sm font-medium text-white shadow-lg shadow-brand/25 transition hover:bg-brand-dark"
+              >
+                Get started
+                <ArrowRight size={16} />
+              </a>
+            </div>
+          </section>
+        </ScrollReveal>
 
         <section id="how-it-works" className="mt-20">
           <ScrollReveal className="mb-8 max-w-2xl">
