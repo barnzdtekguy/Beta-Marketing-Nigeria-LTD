@@ -306,7 +306,7 @@ export default async function HomePage({
             <ul className="mt-4 space-y-3 text-sm text-white/75">
               <li><a href={registerHref} className="transition hover:text-white">Register</a></li>
               <li><a href="/admin/login" className="transition hover:text-white">Admin portal</a></li>
-              <li><a href="mailto:hello@betamarketing.com" className="transition hover:text-white">hello@betamarketing.com</a></li>
+              <li><a href="mailto:betamarketing@betamarketingnigerialtd.com" className="transition hover:text-white">betamarketing@betamarketingnigerialtd.com</a></li>
             </ul>
           </div>
         </div>
